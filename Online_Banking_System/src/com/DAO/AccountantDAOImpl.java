@@ -4,10 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.Exceptions.AccountException;
 import com.Exceptions.AccountantException;
 import com.Exceptions.CustomerException;
+import com.Model.Customer;
 import com.Utility.DBUtil;
 
 public class AccountantDAOImpl implements AccountantDAO {
@@ -93,5 +95,46 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		return ans;
 	}
+
+	@Override
+	public String updateCustomer(int accountNumber, String address) throws CustomerException {
+		String ans = "Could not find the customer. Try again";
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement(" update customer c JOIN account a on c.cusId = a.cusId AND a.accountNumber=? set i.cadd=?");
+			
+			
+		} catch (SQLException e) {
+
+		}
+		
+		return ans;
+	}
+
+	@Override
+	public Customer viewCustomer(String accountNumber) throws CustomerException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getCustomer(String email, String phoneNumber) throws CustomerException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<Customer> viewAllCustomer() throws CustomerException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String deleteCustomer(int accountNumber) throws CustomerException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
