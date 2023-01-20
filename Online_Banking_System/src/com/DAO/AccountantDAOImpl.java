@@ -102,20 +102,74 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
-			PreparedStatement ps = con.prepareStatement(" update customer c JOIN account a on c.cusId = a.cusId AND a.accountNumber=? set i.cadd=?");
+			PreparedStatement ps = con.prepareStatement(" update customer c JOIN account a ON c.cusId = a.cusId where a.accountNumber = ? set c.address = ?");
+			int res = ps.executeUpdate();
 			
+			if(res > 0) {
+				ans = "Updated successfully.";
+			} else {
+				throw new CustomerException("Could not find the customer.");
+			}
 			
 		} catch (SQLException e) {
-
+			throw new CustomerException(e.getMessage());
 		}
 		
 		return ans;
 	}
 
 	@Override
-	public Customer viewCustomer(String accountNumber) throws CustomerException {
-		// TODO Auto-generated method stub
-		return null;
+	public Customer viewCustomer(int accountNumber) throws CustomerException {
+		Customer customer = null;
+		
+		try(Connection conn = DBUtil.provideConnection()) {
+			
+			
+			PreparedStatement ps= conn.prepareStatement("select * from customer c JOIN account a on a.cusId=c.cusId where accountNumber = ?");			
+			
+			ps.setInt(1, accountNumber);
+			
+			
+			ResultSet rs= ps.executeQuery();
+			
+			
+			if(rs.next()) {
+				
+					
+					String n = rs.getString("name");
+					
+					int b = rs.getInt("balance");
+					
+					String e = rs.getString("email");
+					
+					String p = rs.getString("password");
+					
+					int m = rs.getInt("phoneNumber");
+					
+					String ad = rs.getString("address");
+					
+					customer = new Customer();
+					customer.setName(n);
+					customer.setBalance(b);
+					customer.setEmail(e);
+					customer.setPassword(p);
+					customer.setPhoneNumber(m);
+					customer.setAddress(ad);
+				
+			}else
+				throw new CustomerException("Invalid Account No. ");
+			
+			 
+			
+			
+		} catch (SQLException e) {
+			throw new CustomerException(e.getMessage());
+		}
+		
+		
+		
+		return customer;
+
 	}
 
 	@Override
@@ -132,8 +186,32 @@ public class AccountantDAOImpl implements AccountantDAO {
 
 	@Override
 	public String deleteCustomer(int accountNumber) throws CustomerException {
-		// TODO Auto-generated method stub
-		return null;
+		String ans = "Could not find the customer with the given account Number";
+		try(Connection conn= DBUtil.provideConnection()) {
+		 
+		 
+		
+		 PreparedStatement ps=conn.prepareStatement("delete c from customer c JOIN account a on c.cusId = a.cusId where a.accountNumber = ?");
+
+		 ps.setInt(1, accountNumber);
+	
+	     
+		int x=ps.executeUpdate();
+		 
+		 if(x > 0) {
+			 System.out.println("Account deleted sucessfully..!");
+			 System.out.println("-------------------------------");
+		 }else {
+			 System.out.println("Deletion failed...Account Not Found");
+			 System.out.println("------------------------------------");
+		 }	
+		}catch(SQLException e) {
+			
+			e.printStackTrace();
+			ans=e.getMessage();
+		}
+		
+		return ans;
 	}
 
 
