@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.Exceptions.AccountException;
@@ -11,6 +12,7 @@ import com.Exceptions.AccountantException;
 import com.Exceptions.CustomerException;
 import com.Model.Customer;
 import com.Utility.DBUtil;
+import com.mysql.cj.xdevapi.Result;
 
 public class AccountantDAOImpl implements AccountantDAO {
 
@@ -173,18 +175,6 @@ public class AccountantDAOImpl implements AccountantDAO {
 	}
 
 	@Override
-	public int getCustomer(String email, String phoneNumber) throws CustomerException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List<Customer> viewAllCustomer() throws CustomerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String deleteCustomer(int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer with the given account Number";
 		try(Connection conn= DBUtil.provideConnection()) {
@@ -214,5 +204,32 @@ public class AccountantDAOImpl implements AccountantDAO {
 		return ans;
 	}
 
+	@Override
+	public int getCustomer(String email, String phoneNumber) throws CustomerException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
+	@Override
+	public List<Customer> viewAllCustomer() throws CustomerException {
+		List<Customer> list = new ArrayList<>();
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement("select * from customer");
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				
+			}
+			
+		} catch(SQLException e) {
+			
+		}
+		
+		return list;
+	}
+	
+	
 }
