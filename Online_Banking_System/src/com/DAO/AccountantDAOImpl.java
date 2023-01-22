@@ -4,15 +4,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.Exceptions.AccountException;
 import com.Exceptions.AccountantException;
 import com.Exceptions.CustomerException;
 import com.Model.Customer;
+import com.Model.Transactions;
 import com.Utility.DBUtil;
-import com.mysql.cj.xdevapi.Result;
 
 public class AccountantDAOImpl implements AccountantDAO {
 
@@ -43,8 +43,8 @@ public class AccountantDAOImpl implements AccountantDAO {
 	}
 
 	@Override
-	public int addCustomer(String name, String email, String password, int phoneNumber, String address, int balance) throws CustomerException {
-		int ans = -1;
+	public String addCustomer(String name, String email, String password, int phoneNumber, String address, int balance) throws CustomerException {
+		String ans = "Inserted data is incorrect.";
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
@@ -57,64 +57,39 @@ public class AccountantDAOImpl implements AccountantDAO {
 			ps.setInt(6, balance);
 			int res = ps.executeUpdate();
 			if(res > 0) {
-				PreparedStatement p2 = con.prepareStatement("select cusId from customer where phoneNumber = ?");
-				p2.setInt(1, phoneNumber);
-				ResultSet rs = ps.executeQuery();
-				if(rs.next()) {
-					ans = rs.getInt("cusId");
-				}
+				int acc = getAccountNumber(email);
+				ans = "Account added successfully. Customer account number is: " + acc;
 			} else {
-				throw new CustomerException("Inserted data is incorrect.");
+				System.out.println("Inserted data is incorrect.");
 			}
 			
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomerException("Inserted data is incorrect.");
 		}
 		
 		return ans;
 	}
 
 	@Override
-	public String addAccount(int balance, int cusId) throws AccountException {
-		String ans = "Inserted data is incorrect.";
-		
-		try(Connection con = DBUtil.provideConnection()) {
-			
-			PreparedStatement ps = con.prepareStatement("insert into account(balance, cusId) values(?, ?)");
-			ps.setInt(1, balance);
-			ps.setInt(2, cusId);
-			int res = ps.executeUpdate();
-			if(res > 0) {
-				ans = "Customer added successfully.";
-			} else {
-				throw new AccountException(ans);
-			}
-			
-		} catch (SQLException e) {
-			throw new AccountException(ans);
-		}
-		
-		return ans;
-	}
-
-	@Override
-	public String updateCustomer(int accountNumber, String address) throws CustomerException {
+	public String updateAddress(int accountNumber, String address) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
-			PreparedStatement ps = con.prepareStatement(" update customer c JOIN account a ON c.cusId = a.cusId where a.accountNumber = ? set c.address = ?");
+			PreparedStatement ps = con.prepareStatement("update customer set address = ? where accountNumber = ?");
+			ps.setString(1, address);
+			ps.setInt(2, accountNumber);
 			int res = ps.executeUpdate();
 			
 			if(res > 0) {
-				ans = "Updated successfully.";
+				ans = "Address Updated successfully.";
 			} else {
 				throw new CustomerException("Could not find the customer.");
 			}
 			
 		} catch (SQLException e) {
-			throw new CustomerException(e.getMessage());
+			throw new CustomerException(ans);
 		}
 		
 		return ans;
@@ -127,7 +102,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		try(Connection conn = DBUtil.provideConnection()) {
 			
 			
-			PreparedStatement ps= conn.prepareStatement("select * from customer c JOIN account a on a.cusId=c.cusId where accountNumber = ?");			
+			PreparedStatement ps= conn.prepareStatement("select * from customer where accountNumber = ?");			
 			
 			ps.setInt(1, accountNumber);
 			
@@ -137,7 +112,8 @@ public class AccountantDAOImpl implements AccountantDAO {
 			
 			if(rs.next()) {
 				
-					
+					int acc = rs.getInt("accountNumber");
+				
 					String n = rs.getString("name");
 					
 					int b = rs.getInt("balance");
@@ -150,14 +126,8 @@ public class AccountantDAOImpl implements AccountantDAO {
 					
 					String ad = rs.getString("address");
 					
-					customer = new Customer();
-					customer.setName(n);
-					customer.setBalance(b);
-					customer.setEmail(e);
-					customer.setPassword(p);
-					customer.setPhoneNumber(m);
-					customer.setAddress(ad);
-				
+					customer = new Customer(acc, n, e, p, m, ad, b);
+					
 			}else
 				throw new CustomerException("Invalid Account No. ");
 			
@@ -165,7 +135,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 			
 			
 		} catch (SQLException e) {
-			throw new CustomerException(e.getMessage());
+			throw new CustomerException("Invalid Account No. ");
 		}
 		
 		
@@ -181,7 +151,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		 
 		 
 		
-		 PreparedStatement ps=conn.prepareStatement("delete c from customer c JOIN account a on c.cusId = a.cusId where a.accountNumber = ?");
+		 PreparedStatement ps=conn.prepareStatement("delete from customer where accountNumber = ?");
 
 		 ps.setInt(1, accountNumber);
 	
@@ -205,12 +175,6 @@ public class AccountantDAOImpl implements AccountantDAO {
 	}
 
 	@Override
-	public int getCustomer(String email, String phoneNumber) throws CustomerException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public List<Customer> viewAllCustomer() throws CustomerException {
 		List<Customer> list = new ArrayList<>();
 		
@@ -221,15 +185,266 @@ public class AccountantDAOImpl implements AccountantDAO {
 			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()) {
+				int accno = rs.getInt("accountNumber");
+				String name = rs.getString("name");
+				String email = rs.getString("email");
+				String password = rs.getString("password");
+				int phoneNumber = rs.getInt("phoneNumber");
+				String address = rs.getString("address");
+				int balance = rs.getInt("balance");
 				
-			}
+				Customer cus = new Customer(accno, name, email, password, phoneNumber, address, balance);
+				list.add(cus);
+			} 
 			
 		} catch(SQLException e) {
-			
+			throw new CustomerException("Data could not be retrieved.");
 		}
 		
 		return list;
 	}
+
+	@Override
+	public String updateName(String name, int accountNumber) throws CustomerException {
+		String ans = "Could not find the customer. Try again";
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement(" update customer set name = ? where accountNumber = ?");
+			ps.setString(1, name);
+			ps.setInt(2, accountNumber);
+			int res = ps.executeUpdate();
+			
+			if(res > 0) {
+				ans = "Name updated successfully.";
+			} else {
+				throw new CustomerException("Could not find the customer.");
+			}
+			
+		} catch (SQLException e) {
+			throw new CustomerException(ans);
+		}
+		
+		return ans;
+	}
+
+	@Override
+	public String updateEmail(String email, int accountNumber) throws CustomerException {
+		String ans = "Could not find the customer. Try again";
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement(" update customer set email = ? where accountNumber = ?");
+			ps.setString(1, email);
+			ps.setInt(2, accountNumber);
+			int res = ps.executeUpdate();
+			
+			if(res > 0) {
+				ans = "Email updated successfully.";
+			} else {
+				throw new CustomerException("Could not find the customer.");
+			}
+			
+		} catch (SQLException e) {
+			throw new CustomerException(ans);
+		}
+		
+		return ans;
+	}
+
+	@Override
+	public String updatePhoneNumber(int phoneNumber, int accountNumber) throws CustomerException {
+		String ans = "Could not find the customer. Try again";
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement(" update customer set phoneNumber = ? where accountNumber = ?");
+			ps.setInt(1, phoneNumber);
+			ps.setInt(2, accountNumber);
+			int res = ps.executeUpdate();
+			
+			if(res > 0) {
+				ans = "Phone Number updated successfully.";
+			} else {
+				throw new CustomerException("Could not find the customer.");
+			}
+			
+		} catch (SQLException e) {
+			throw new CustomerException(ans);
+		}
+		
+		return ans;
+	}
+
+	@Override
+	public List<Transactions> viewTransaction(int accountNumber) throws CustomerException {
+		List<Transactions> list = new ArrayList<>();
+		
+		try(Connection conn = DBUtil.provideConnection()) {
+			if(checkAccount(accountNumber)) {
+			
+				PreparedStatement ps=conn.prepareStatement("select * from transactions where accountNumber = ?");
+				ps.setInt(1, accountNumber);
+				
+				ResultSet rs = ps.executeQuery();
+				
+				if(rs.next()) {
+					
+					while(rs.next()) {
+						int tid = rs.getInt("transactionId");
+						int accNo = rs.getInt("accountNumber");
+						int dep = rs.getInt("deposit");
+						int with = rs.getInt("withdraw");
+						Timestamp t = rs.getTimestamp("timeOfTransaction");
+						
+						Transactions ts = new Transactions(tid, accNo, dep, with, t);
+						list.add(ts);
+					}
+					
+				} else {
+					throw new CustomerException("No transactions have been made by this account number.");
+				}
+			
+			} else {
+				
+				throw new CustomerException("Invalid account number.");
+			
+			}
+			
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		
+		return list;
+	}
+
+	@Override
+	public List<Transactions> viewTransaction() throws CustomerException {
+		List<Transactions> list = new ArrayList<>();
+		
+		try(Connection conn = DBUtil.provideConnection()) {
+			PreparedStatement ps=conn.prepareStatement("select * from transactions");
+			
+			ResultSet rs = ps.executeQuery();
+			
+				while(rs.next()) {
+					int tid = rs.getInt("transactionId");
+					int accNo = rs.getInt("accountNumber");
+					int dep = rs.getInt("deposit");
+					int with = rs.getInt("withdraw");
+					Timestamp t = rs.getTimestamp("timeOfTransaction");
+					
+					Transactions ts = new Transactions(tid, accNo, dep, with, t);
+					list.add(ts);
+				}  
+			
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		
+		return list;
+	}
+
+	@Override
+	public int getAccountNumberUsingEmail(String email) throws CustomerException {
+		int accNo = -1;
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement("select accountNumber from customer where email = ?");
+			ps.setString(1, email);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				accNo = rs.getInt("accountNumber");
+			} else {
+				throw new CustomerException("Invalid email.");
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+		}
+		
+		return accNo;
+	}
 	
+	private int getAccountNumber(String email) throws CustomerException {
+		int accNo = -1;
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement("select accountNumber from customer where email = ?");
+			ps.setString(1, email);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				accNo = rs.getInt("accountNumber");
+			} else {
+				throw new CustomerException("Invalid email.");
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+		}
+		
+		return accNo;
+	}
+	private boolean checkAccount(int accountNumber) {
+		
+		try(Connection conn = DBUtil.provideConnection()) {
+			PreparedStatement ps=conn.prepareStatement("select * from Customer where accountNumber=?;");
+			
+			ps.setInt(1, accountNumber);
+			
+			ResultSet rs=ps.executeQuery();
+			
+			if(rs.next()) {
+				return true;
+			}
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+		
+	}
+
+	@Override
+	public String addAccountant(String email, String password, String name) throws AccountantException {
+		String response = "Accountant could not be added.";
+		
+		try(Connection con = DBUtil.provideConnection()) {
+			
+			PreparedStatement ps = con.prepareStatement("insert into accountant values(?, ?, ?)");
+			ps.setString(1, email);
+			ps.setString(2, password);
+			ps.setString(3, name);
+			int ans = ps.executeUpdate();
+			if(ans > 0) {
+				response = "Accountant added sucessfully!";
+				
+			} else {
+				throw new AccountantException(response);
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			response = e.getMessage();
+		}
+		
+		
+		return response;
+	}
 	
 }

@@ -1,12 +1,10 @@
 package com.Model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class Transactions {
 	private int transactionId;
 	private int accountNumber;
-	private String branch;
-	private String ifscCode;
 	private int deposit;
 	private int withdraw;
 	private Timestamp timeOfTransaction;
@@ -15,13 +13,10 @@ public class Transactions {
 		
 	}
 
-	public Transactions(int transactionId, int accountNumber, String branch, String ifscCode, int deposit, int withdraw,
-			Timestamp timeOfTransaction) {
+	public Transactions(int transactionId, int accountNumber, int deposit, int withdraw, Timestamp timeOfTransaction) {
 		super();
 		this.transactionId = transactionId;
 		this.accountNumber = accountNumber;
-		this.branch = branch;
-		this.ifscCode = ifscCode;
 		this.deposit = deposit;
 		this.withdraw = withdraw;
 		this.timeOfTransaction = timeOfTransaction;
@@ -41,22 +36,6 @@ public class Transactions {
 
 	public void setAccountNumber(int accountNumber) {
 		this.accountNumber = accountNumber;
-	}
-
-	public String getBranch() {
-		return branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
-
-	public String getIfscCode() {
-		return ifscCode;
-	}
-
-	public void setIfscCode(String ifscCode) {
-		this.ifscCode = ifscCode;
 	}
 
 	public int getDeposit() {
@@ -85,10 +64,10 @@ public class Transactions {
 
 	@Override
 	public String toString() {
-		return "Transactions [transactionId=" + transactionId + ", accountNumber=" + accountNumber + ", branch="
-				+ branch + ", ifscCode=" + ifscCode + ", deposit=" + deposit + ", withdraw=" + withdraw
-				+ ", timeOfTransaction=" + timeOfTransaction + "]";
+		return "Transactions [transactionId=" + transactionId + ", accountNumber=" + accountNumber + ", deposit="
+				+ deposit + ", withdraw=" + withdraw + ", timeOfTransaction=" + timeOfTransaction + "]";
 	}
+	
 
 	
 	
