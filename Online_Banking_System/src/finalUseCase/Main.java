@@ -174,7 +174,6 @@ public class Main {
 				sc.nextLine();
 				try {
 					String res = a.deleteCustomer(acc);
-					System.out.println(ConsoleColors.YELLOW_BOLD+res+ConsoleColors.RESET);
 					accountantMenu();
 				} catch (CustomerException e) {
 					System.out.println(ConsoleColors.RED_BACKGROUND_BRIGHT+e.getMessage()+ConsoleColors.RESET);
