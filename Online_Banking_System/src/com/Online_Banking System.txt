@@ -1,0 +1,64 @@
+Problem Description:
+
+
+The objective of this project is to maintain the accounts and transactions like withdrawing, depositing money, transferring and viewing all the details of transactions. Bank provides account number to the customer for dealing transactions in the bank. An accountant registers a customer using his/her details. 
+
+
+Users of this project are:
+
+• Accountants
+• Customers
+
+
+Roles of Accountant are
+
+• Login using his/her username and password
+• Adding new account for customer
+• Editing already available account
+• Removing the account by using account number
+• Viewing particular account details by giving account number
+• Viewing all the account details
+• Taking care of deposit and withdrawal operations
+
+
+
+Roles of Customer are
+
+• Login using his/her username and password
+• Transfer the money from his account to other account
+• Checking the transaction history
+
+
+Tables used in this project are:
+
+Customer
+
+It has the following fields:
+
+1. Account Number
+2. Name
+3. Email
+4. Password
+5. Phone Number
+6. Address
+7. Balance
+
+Accountant
+
+It has the following fields:
+
+1. Accountant ID
+2. Password
+3. Accountant Name
+
+Transactions 
+
+It has the following fields:
+
+1. Transactions ID
+2. Account Number
+3. Deposit
+4. Withdraw
+5. Time Of transaction
+
+
