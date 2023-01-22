@@ -4,18 +4,16 @@ public class Accountant {
 	private String accId;
 	private String password;
 	private String accName;
-	private String branch;
 	
 	public Accountant() {
 		
 	}
 
-	public Accountant(String accId, String password, String accName, String branch) {
+	public Accountant(String accId, String password, String accName) {
 		super();
 		this.accId = accId;
 		this.password = password;
 		this.accName = accName;
-		this.branch = branch;
 	}
 
 	public String getAccId() {
@@ -42,18 +40,9 @@ public class Accountant {
 		this.accName = accName;
 	}
 
-	public String getBranch() {
-		return branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
-
 	@Override
 	public String toString() {
-		return "Accountant [accId=" + accId + ", password=" + password + ", accName=" + accName + ", branch=" + branch
-				+ "]";
+		return "Accountant [accId=" + accId + ", password=" + password + ", accName=" + accName + "]";
 	}
 	
 	

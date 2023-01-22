@@ -1,0 +1,39 @@
+
+
+//creating table customer
+
+create table customer(
+accountNumber bigint primary key auto_increment,
+name varchar(25) NOT NULL,
+email varchar(42) UNIQUE NOT NULL,
+password varchar(25) NOT NULL,
+phoneNumber bigint NOT NULL,
+address varchar(50) NOT NULL,
+balance bigint
+);
+
+ alter table customer auto_increment=2000001;
+
+//creating table accountant
+
+create table accountant(
+accId varchar(40) primary key,
+password varchar(35) NOT NULL,
+accName varchar(30) NOT NULL
+);
+
+
+
+//creating table transactions
+
+
+create table transactions(
+transactionId int primary key AUTO_INCREMENT,
+accountNumber bigint,
+deposit bigint,
+withdraw bigint,
+timeOfTransaction TIMESTAMP default NULL,
+foreign key(accountNumber) references customer(accountNumber) ON DELETE CASCADE
+);
+
+
