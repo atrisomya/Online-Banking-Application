@@ -6,7 +6,9 @@ Problem Description:
 The objective of this project is to maintain the accounts and transactions like withdrawing, depositing money, transferring and viewing all the details of transactions. Bank provides account number to the customer for dealing transactions in the bank. An accountant registers a customer using his/her details. 
 
 
- ![ER diagram](https://lh6.googleusercontent.com/-zlI1jSs_OL6kSrRsFhgy9kkayJYVFrYHpkw4rPdFpumJNPQSkg4eaL62pywxfeTg6M=w2400) 
+ ![ER diagram](https://lh6.googleusercontent.com/-zlI1jSs_OL6kSrRsFhgy9kkayJYVFrYHpkw4rPdFpumJNPQSkg4eaL62pywxfeTg6M=w2400)
+ 
+ ![Flow Diagram](https://lh3.googleusercontent.com/XVYCcmag8YyKN2buaDxd0DvbQZECprekYFKKCk1ESynnLjFF1TPv4v_4F03mosNRymc=w2400)
 
 
 Users of this project are:
