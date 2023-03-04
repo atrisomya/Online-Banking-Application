@@ -21,7 +21,7 @@ public class CustomerDAOImpl implements CustomerDAO{
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
-			PreparedStatement ps = con.prepareStatement("select name, accountNumber from Customer where email = ? AND password = ?");
+			PreparedStatement ps = con.prepareStatement("select name, accountNumber from Customer where email = ? AND password = md5(?)");
 			ps.setString(1, email);
 			ps.setString(2, password);
 			
@@ -174,7 +174,7 @@ public class CustomerDAOImpl implements CustomerDAO{
 		String response = "Invalid account number. ";
 		int previousBal = viewBalance(accountNumber1);
 		
-		if(previousBal >= amount && checkAccount(accountNumber2)) {
+		if(previousBal >= amount && checkAccount(accountNumber2) && amount >= 0) {
 			
 			int with = withdraw(accountNumber1, amount);
 			int dep = Deposit(accountNumber2, amount);

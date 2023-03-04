@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBUtil {
-
+	//Making connections with the database
 	public static Connection provideConnection() {
 		
 		Connection con = null;

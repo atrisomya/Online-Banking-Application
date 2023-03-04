@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.Exceptions.AccountantException;
 import com.Exceptions.CustomerException;
@@ -15,7 +17,7 @@ import com.Model.Transactions;
 import com.Utility.DBUtil;
 
 public class AccountantDAOImpl implements AccountantDAO {
-
+	//Accountant Login
 	@Override
 	public String Login(String email, String password) throws AccountantException {
 
@@ -23,7 +25,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
-			PreparedStatement ps = con.prepareStatement("select accName from accountant where accId = ? AND password = ?");
+			PreparedStatement ps = con.prepareStatement("select accName from accountant where accId = ? AND password = md5(?)");
 			ps.setString(1, email);
 			ps.setString(2, password);
 			ResultSet rs = ps.executeQuery();
@@ -41,14 +43,20 @@ public class AccountantDAOImpl implements AccountantDAO {
 		return ans;
 	
 	}
-
+	//Adding customer as an accountant
 	@Override
 	public String addCustomer(String name, String email, String password, int phoneNumber, String address, int balance) throws CustomerException {
+		String regex = "^(.+)@(.+)$";
+		Pattern pattern = Pattern.compile(regex); 
+		Matcher matcher = pattern.matcher(email);  
+		if(!matcher.matches()) {
+			throw new CustomerException("Invalid Email format");
+		}
 		String ans = "Inserted data is incorrect.";
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
-			PreparedStatement ps = con.prepareStatement("insert into customer(name, email, password, phoneNumber, address, balance) values(?, ?, ?, ?, ?, ?)");
+			PreparedStatement ps = con.prepareStatement("insert into customer(name, email, password, phoneNumber, address, balance) values(?, ?, md5(?), ?, ?, ?)");
 			ps.setString(1, name);
 			ps.setString(2, email);
 			ps.setString(3, password);
@@ -70,7 +78,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		return ans;
 	}
-
+	//updating address by accountNumber
 	@Override
 	public String updateAddress(int accountNumber, String address) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
@@ -94,7 +102,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		return ans;
 	}
-
+	//Getting the details of the customer by their account number
 	@Override
 	public Customer viewCustomer(int accountNumber) throws CustomerException {
 		Customer customer = null;
@@ -143,7 +151,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		return customer;
 
 	}
-
+	//delete customer by their account number
 	@Override
 	public String deleteCustomer(int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer with the given account Number";
@@ -173,7 +181,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		return ans;
 	}
-
+	//Get all the customers
 	@Override
 	public List<Customer> viewAllCustomer() throws CustomerException {
 		List<Customer> list = new ArrayList<>();
@@ -203,7 +211,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		
 		return list;
 	}
-
+	//updating the name of the customer
 	@Override
 	public String updateName(String name, int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
@@ -421,11 +429,17 @@ public class AccountantDAOImpl implements AccountantDAO {
 
 	@Override
 	public String addAccountant(String email, String password, String name) throws AccountantException {
+		String regex = "^(.+)@(.+)$";
+		Pattern pattern = Pattern.compile(regex); 
+		Matcher matcher = pattern.matcher(email);  
+		if(!matcher.matches()) {
+			throw new AccountantException("Invalid Email format");
+		}
 		String response = "Accountant could not be added.";
 		
 		try(Connection con = DBUtil.provideConnection()) {
 			
-			PreparedStatement ps = con.prepareStatement("insert into accountant values(?, ?, ?)");
+			PreparedStatement ps = con.prepareStatement("insert into accountant values(?, md5(?), ?)");
 			ps.setString(1, email);
 			ps.setString(2, password);
 			ps.setString(3, name);
