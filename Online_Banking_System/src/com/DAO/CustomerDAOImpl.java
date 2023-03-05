@@ -13,13 +13,19 @@ import com.Model.Transactions;
 import com.Utility.DBUtil;
 
 public class CustomerDAOImpl implements CustomerDAO{
+	
+	public Connection con;
+	
+	public CustomerDAOImpl() {
+		con = DBUtil.provideConnection();
+	}
 
 	@Override
 	public int LoginCustomer(String email, String password) throws CustomerException {
 		int acc = -1;
 		String response = "Invalid email or password.";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select name, accountNumber from Customer where email = ? AND password = md5(?)");
 			ps.setString(1, email);
@@ -45,7 +51,7 @@ public class CustomerDAOImpl implements CustomerDAO{
 	public int viewBalance(int accountNumber) throws CustomerException {
 		int response = -1;
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select balance from Customer where accountNumber = ?");
 			ps.setInt(1, accountNumber);
@@ -69,7 +75,7 @@ public class CustomerDAOImpl implements CustomerDAO{
 	public int Deposit(int accountNumber, int amount) throws CustomerException {
 		int response = -1;
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("update Customer set balance = balance+? where accountNumber = ?");
 			ps.setInt(1, amount);
@@ -107,7 +113,7 @@ public class CustomerDAOImpl implements CustomerDAO{
 		
 		int response = -1;
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			int previousBal = viewBalance(accountNumber);
 			
@@ -151,8 +157,8 @@ public class CustomerDAOImpl implements CustomerDAO{
 	
 	private boolean checkAccount(int accountNumber) {
 		
-		try(Connection conn = DBUtil.provideConnection()) {
-			PreparedStatement ps=conn.prepareStatement("select * from Customer where accountNumber=?;");
+		try {
+			PreparedStatement ps=con.prepareStatement("select * from Customer where accountNumber=?;");
 			
 			ps.setInt(1, accountNumber);
 			
@@ -200,8 +206,8 @@ public class CustomerDAOImpl implements CustomerDAO{
 	public List<Transactions> viewTransaction(int accountNumber) throws CustomerException {
 		List<Transactions> list = new ArrayList<>();
 		
-		try(Connection conn = DBUtil.provideConnection()) {
-			PreparedStatement ps=conn.prepareStatement("select * from transactions where accountNumber = ?");
+		try {
+			PreparedStatement ps=con.prepareStatement("select * from transactions where accountNumber = ?");
 			ps.setInt(1, accountNumber);
 			
 			ResultSet rs = ps.executeQuery();
@@ -230,7 +236,7 @@ public class CustomerDAOImpl implements CustomerDAO{
 	public int getAccNo(String email) {
 		int acc = -1;
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select accountNumber from customer where email = ?");
 			ps.setString(1, email);

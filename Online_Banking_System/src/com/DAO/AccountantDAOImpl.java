@@ -17,13 +17,20 @@ import com.Model.Transactions;
 import com.Utility.DBUtil;
 
 public class AccountantDAOImpl implements AccountantDAO {
+	
+	public Connection con;
+
+	public AccountantDAOImpl() {
+		con = DBUtil.provideConnection();
+	}
+	
 	//Accountant Login
 	@Override
 	public String Login(String email, String password) throws AccountantException {
 
 		String ans = "Invalid ID or password";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select accName from accountant where accId = ? AND password = md5(?)");
 			ps.setString(1, email);
@@ -54,7 +61,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		}
 		String ans = "Inserted data is incorrect.";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("insert into customer(name, email, password, phoneNumber, address, balance) values(?, ?, md5(?), ?, ?, ?)");
 			ps.setString(1, name);
@@ -83,7 +90,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public String updateAddress(int accountNumber, String address) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("update customer set address = ? where accountNumber = ?");
 			ps.setString(1, address);
@@ -107,10 +114,10 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public Customer viewCustomer(int accountNumber) throws CustomerException {
 		Customer customer = null;
 		
-		try(Connection conn = DBUtil.provideConnection()) {
+		try {
 			
 			
-			PreparedStatement ps= conn.prepareStatement("select * from customer where accountNumber = ?");			
+			PreparedStatement ps= con.prepareStatement("select * from customer where accountNumber = ?");			
 			
 			ps.setInt(1, accountNumber);
 			
@@ -155,11 +162,11 @@ public class AccountantDAOImpl implements AccountantDAO {
 	@Override
 	public String deleteCustomer(int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer with the given account Number";
-		try(Connection conn= DBUtil.provideConnection()) {
+		try {
 		 
 		 
 		
-		 PreparedStatement ps=conn.prepareStatement("delete from customer where accountNumber = ?");
+		 PreparedStatement ps=con.prepareStatement("delete from customer where accountNumber = ?");
 
 		 ps.setInt(1, accountNumber);
 	
@@ -186,7 +193,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public List<Customer> viewAllCustomer() throws CustomerException {
 		List<Customer> list = new ArrayList<>();
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select * from customer");
 			
@@ -216,7 +223,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public String updateName(String name, int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement(" update customer set name = ? where accountNumber = ?");
 			ps.setString(1, name);
@@ -240,7 +247,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public String updateEmail(String email, int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement(" update customer set email = ? where accountNumber = ?");
 			ps.setString(1, email);
@@ -264,7 +271,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public String updatePhoneNumber(int phoneNumber, int accountNumber) throws CustomerException {
 		String ans = "Could not find the customer. Try again";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement(" update customer set phoneNumber = ? where accountNumber = ?");
 			ps.setInt(1, phoneNumber);
@@ -288,10 +295,10 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public List<Transactions> viewTransaction(int accountNumber) throws CustomerException {
 		List<Transactions> list = new ArrayList<>();
 		
-		try(Connection conn = DBUtil.provideConnection()) {
+		try {
 			if(checkAccount(accountNumber)) {
 			
-				PreparedStatement ps=conn.prepareStatement("select * from transactions where accountNumber = ?");
+				PreparedStatement ps=con.prepareStatement("select * from transactions where accountNumber = ?");
 				ps.setInt(1, accountNumber);
 				
 				ResultSet rs = ps.executeQuery();
@@ -332,8 +339,8 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public List<Transactions> viewTransaction() throws CustomerException {
 		List<Transactions> list = new ArrayList<>();
 		
-		try(Connection conn = DBUtil.provideConnection()) {
-			PreparedStatement ps=conn.prepareStatement("select * from transactions");
+		try {
+			PreparedStatement ps=con.prepareStatement("select * from transactions");
 			
 			ResultSet rs = ps.executeQuery();
 			
@@ -361,7 +368,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	public int getAccountNumberUsingEmail(String email) throws CustomerException {
 		int accNo = -1;
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select accountNumber from customer where email = ?");
 			ps.setString(1, email);
@@ -386,7 +393,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 	private int getAccountNumber(String email) throws CustomerException {
 		int accNo = -1;
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("select accountNumber from customer where email = ?");
 			ps.setString(1, email);
@@ -409,8 +416,8 @@ public class AccountantDAOImpl implements AccountantDAO {
 	}
 	private boolean checkAccount(int accountNumber) {
 		
-		try(Connection conn = DBUtil.provideConnection()) {
-			PreparedStatement ps=conn.prepareStatement("select * from Customer where accountNumber=?;");
+		try {
+			PreparedStatement ps=con.prepareStatement("select * from Customer where accountNumber=?;");
 			
 			ps.setInt(1, accountNumber);
 			
@@ -437,7 +444,7 @@ public class AccountantDAOImpl implements AccountantDAO {
 		}
 		String response = "Accountant could not be added.";
 		
-		try(Connection con = DBUtil.provideConnection()) {
+		try {
 			
 			PreparedStatement ps = con.prepareStatement("insert into accountant values(?, md5(?), ?)");
 			ps.setString(1, email);

@@ -45,7 +45,7 @@ public class Main {
 		
 		try {
 			
-			AccountantDAO a = new AccountantDAOImpl();
+			AccountantDAOImpl a = new AccountantDAOImpl();
 			
 			String ch = sc.nextLine();
 			int choice = Integer.parseInt(ch);
@@ -287,6 +287,7 @@ public class Main {
 				menu();
 			} else if(choice == 13) {
 				System.out.println(ConsoleColors.CYAN_BOLD_BRIGHT+"Thank you for using this application."+ConsoleColors.RESET);
+				a.con.close();
 				sc.close();
 			} else {
 				System.out.println(ConsoleColors.RED_BACKGROUND_BRIGHT+"Invalid selection."+ConsoleColors.RESET);
@@ -343,7 +344,7 @@ public class Main {
 							+ "+================================+" +"\n"
 							+ConsoleColors.RESET);
 		
-		CustomerDAO c = new CustomerDAOImpl();
+		CustomerDAOImpl c = new CustomerDAOImpl();
 		
 		try {
 			
@@ -444,6 +445,7 @@ public class Main {
 				menu();
 			} else if(choice == 7) {
 				System.out.println(ConsoleColors.CYAN_BOLD_BRIGHT+"Thank you for using this application."+ConsoleColors.RESET);
+				c.con.close();
 				sc.close();
 			} else {
 				System.out.println(ConsoleColors.RED_BACKGROUND_BRIGHT+"Invalid selection."+ConsoleColors.RESET);
